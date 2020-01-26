@@ -27,6 +27,7 @@ quote = { version = "1.0", default_features = false }
 
 [features]
 proc-macro = []
+procmacro2_semver_exempt = ["span-locations"]
 default = ["proc-macro"]
 
 # Expose methods Span::start and Span::end which give the line/column location

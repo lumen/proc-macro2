@@ -7,18 +7,18 @@ use unicode_xid::UnicodeXID;
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub struct Cursor<'a> {
     pub rest: &'a str,
-    #[cfg(span_locations)]
+    #[cfg(feature = "span-locations")]
     pub off: u32,
 }
 
 impl<'a> Cursor<'a> {
-    #[cfg(not(span_locations))]
+    #[cfg(not(feature = "span-locations"))]
     pub fn advance(&self, amt: usize) -> Cursor<'a> {
         Cursor {
             rest: &self.rest[amt..],
         }
     }
-    #[cfg(span_locations)]
+    #[cfg(feature = "span-locations")]
     pub fn advance(&self, amt: usize) -> Cursor<'a> {
         Cursor {
             rest: &self.rest[amt..],

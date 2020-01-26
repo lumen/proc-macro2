@@ -24,7 +24,7 @@
 //     Implement the semver exempt API in terms of the nightly-only proc_macro
 //     API. Enabled when using procmacro2_semver_exempt on a nightly compiler.
 //
-// "span_locations"
+// "span-locations"
 //     Provide methods Span::start and Span::end which give the line/column
 //     location of a token. Enabled by procmacro2_semver_exempt or the
 //     "span-locations" Cargo cfg. This is behind a cfg because tracking
@@ -47,7 +47,7 @@ fn main() {
         process::exit(1);
     }
 
-    let semver_exempt = cfg!(procmacro2_semver_exempt);
+    let semver_exempt = cfg!(feature = "procmacro2_semver_exempt");
     if semver_exempt {
         // https://github.com/alexcrichton/proc-macro2/issues/147
         println!("cargo:rustc-cfg=procmacro2_semver_exempt");

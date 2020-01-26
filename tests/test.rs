@@ -13,7 +13,7 @@ fn idents() {
 }
 
 #[test]
-#[cfg(procmacro2_semver_exempt)]
+#[cfg(feature = "procmacro2_semver_exempt")]
 fn raw_idents() {
     assert_eq!(
         Ident::new_raw("String", Span::call_site()).to_string(),
@@ -163,7 +163,7 @@ fn fail() {
     fail("r#_");
 }
 
-#[cfg(span_locations)]
+#[cfg(feature = "span-locations")]
 #[test]
 fn span_test() {
     use proc_macro2::TokenTree;
@@ -218,7 +218,7 @@ testing 123
     );
 }
 
-#[cfg(procmacro2_semver_exempt)]
+#[cfg(feature = "procmacro2_semver_exempt")]
 #[cfg(not(nightly))]
 #[test]
 fn default_span() {
@@ -233,7 +233,7 @@ fn default_span() {
     assert!(!source_file.is_real());
 }
 
-#[cfg(procmacro2_semver_exempt)]
+#[cfg(feature = "procmacro2_semver_exempt")]
 #[test]
 fn span_join() {
     let source1 = "aaa\nbbb"
@@ -345,10 +345,10 @@ fn raw_identifier() {
 fn test_debug_ident() {
     let ident = Ident::new("proc_macro", Span::call_site());
 
-    #[cfg(not(procmacro2_semver_exempt))]
+    #[cfg(not(feature = "procmacro2_semver_exempt"))]
     let expected = "Ident(proc_macro)";
 
-    #[cfg(procmacro2_semver_exempt)]
+    #[cfg(feature = "procmacro2_semver_exempt")]
     let expected = "Ident { sym: proc_macro, span: bytes(0..0) }";
 
     assert_eq!(expected, format!("{:?}", ident));
@@ -358,7 +358,7 @@ fn test_debug_ident() {
 fn test_debug_tokenstream() {
     let tts = TokenStream::from_str("[a + 1]").unwrap();
 
-    #[cfg(not(procmacro2_semver_exempt))]
+    #[cfg(not(feature = "procmacro2_semver_exempt"))]
     let expected = "\
 TokenStream [
     Group {
@@ -379,7 +379,7 @@ TokenStream [
 ]\
     ";
 
-    #[cfg(not(procmacro2_semver_exempt))]
+    #[cfg(not(feature = "procmacro2_semver_exempt"))]
     let expected_before_trailing_commas = "\
 TokenStream [
     Group {
@@ -400,7 +400,7 @@ TokenStream [
 ]\
     ";
 
-    #[cfg(procmacro2_semver_exempt)]
+    #[cfg(feature = "procmacro2_semver_exempt")]
     let expected = "\
 TokenStream [
     Group {
@@ -425,7 +425,7 @@ TokenStream [
 ]\
     ";
 
-    #[cfg(procmacro2_semver_exempt)]
+    #[cfg(feature = "procmacro2_semver_exempt")]
     let expected_before_trailing_commas = "\
 TokenStream [
     Group {

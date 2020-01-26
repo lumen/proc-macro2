@@ -49,7 +49,7 @@ assert_impl!(Span is not Send or Sync);
 assert_impl!(TokenStream is not Send or Sync);
 assert_impl!(TokenTree is not Send or Sync);
 
-#[cfg(procmacro2_semver_exempt)]
+#[cfg(feature = "procmacro2_semver_exempt")]
 mod semver_exempt {
     use super::*;
 

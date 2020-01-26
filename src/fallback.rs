@@ -1,11 +1,11 @@
-#[cfg(span_locations)]
+#[cfg(feature = "span-locations")]
 use std::cell::RefCell;
-#[cfg(span_locations)]
+#[cfg(feature = "span-locations")]
 use std::cmp;
 use std::fmt;
 use std::iter;
 use std::ops::RangeBounds;
-#[cfg(procmacro2_semver_exempt)]
+#[cfg(feature = "procmacro2_semver_exempt")]
 use std::path::Path;
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -33,7 +33,7 @@ impl TokenStream {
     }
 }
 
-#[cfg(span_locations)]
+#[cfg(feature = "span-locations")]
 fn get_cursor(src: &str) -> Cursor {
     // Create a dummy file & add it to the source map
     SOURCE_MAP.with(|cm| {
@@ -47,7 +47,7 @@ fn get_cursor(src: &str) -> Cursor {
     })
 }
 
-#[cfg(not(span_locations))]
+#[cfg(not(feature = "span-locations"))]
 fn get_cursor(src: &str) -> Cursor {
     Cursor { rest: src }
 }
@@ -223,13 +223,13 @@ pub struct LineColumn {
     pub column: usize,
 }
 
-#[cfg(span_locations)]
+#[cfg(feature = "span-locations")]
 thread_local! {
     static SOURCE_MAP: RefCell<SourceMap> = RefCell::new(SourceMap {
         // NOTE: We start with a single dummy file which all call_site() and
         // def_site() spans reference.
         files: vec![{
-            #[cfg(procmacro2_semver_exempt)]
+            #[cfg(feature = "procmacro2_semver_exempt")]
             {
                 FileInfo {
                     name: "<unspecified>".to_owned(),
@@ -238,7 +238,7 @@ thread_local! {
                 }
             }
 
-            #[cfg(not(procmacro2_semver_exempt))]
+            #[cfg(not(feature = "procmacro2_semver_exempt"))]
             {
                 FileInfo {
                     span: Span { lo: 0, hi: 0 },
@@ -249,15 +249,15 @@ thread_local! {
     });
 }
 
-#[cfg(span_locations)]
+#[cfg(feature = "span-locations")]
 struct FileInfo {
-    #[cfg(procmacro2_semver_exempt)]
+    #[cfg(feature = "procmacro2_semver_exempt")]
     name: String,
     span: Span,
     lines: Vec<usize>,
 }
 
-#[cfg(span_locations)]
+#[cfg(feature = "span-locations")]
 impl FileInfo {
     fn offset_line_column(&self, offset: usize) -> LineColumn {
         assert!(self.span_within(Span {
@@ -283,7 +283,7 @@ impl FileInfo {
 }
 
 /// Computesthe offsets of each line in the given source string.
-#[cfg(span_locations)]
+#[cfg(feature = "span-locations")]
 fn lines_offsets(s: &str) -> Vec<usize> {
     let mut lines = vec![0];
     let mut prev = 0;
@@ -294,12 +294,12 @@ fn lines_offsets(s: &str) -> Vec<usize> {
     lines
 }
 
-#[cfg(span_locations)]
+#[cfg(feature = "span-locations")]
 struct SourceMap {
     files: Vec<FileInfo>,
 }
 
-#[cfg(span_locations)]
+#[cfg(feature = "span-locations")]
 impl SourceMap {
     fn next_start_pos(&self) -> u32 {
         // Add 1 so there's always space between files.
@@ -318,14 +318,14 @@ impl SourceMap {
             hi: lo + (src.len() as u32),
         };
 
-        #[cfg(procmacro2_semver_exempt)]
+        #[cfg(feature = "procmacro2_semver_exempt")]
         self.files.push(FileInfo {
             name: name.to_owned(),
             span,
             lines,
         });
 
-        #[cfg(not(procmacro2_semver_exempt))]
+        #[cfg(not(feature = "procmacro2_semver_exempt"))]
         self.files.push(FileInfo { span, lines });
         let _ = name;
 
@@ -344,29 +344,29 @@ impl SourceMap {
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Span {
-    #[cfg(span_locations)]
+    #[cfg(feature = "span-locations")]
     lo: u32,
-    #[cfg(span_locations)]
+    #[cfg(feature = "span-locations")]
     hi: u32,
 }
 
 impl Span {
-    #[cfg(not(span_locations))]
+    #[cfg(not(feature = "span-locations"))]
     pub fn call_site() -> Span {
         Span {}
     }
 
-    #[cfg(span_locations)]
+    #[cfg(feature = "span-locations")]
     pub fn call_site() -> Span {
         Span { lo: 0, hi: 0 }
     }
 
-    #[cfg(procmacro2_semver_exempt)]
+    #[cfg(feature = "procmacro2_semver_exempt")]
     pub fn def_site() -> Span {
         Span::call_site()
     }
 
-    #[cfg(procmacro2_semver_exempt)]
+    #[cfg(feature = "procmacro2_semver_exempt")]
     pub fn resolved_at(&self, _other: Span) -> Span {
         // Stable spans consist only of line/column information, so
         // `resolved_at` and `located_at` only select which span the
@@ -374,12 +374,12 @@ impl Span {
         *self
     }
 
-    #[cfg(procmacro2_semver_exempt)]
+    #[cfg(feature = "procmacro2_semver_exempt")]
     pub fn located_at(&self, other: Span) -> Span {
         other
     }
 
-    #[cfg(procmacro2_semver_exempt)]
+    #[cfg(feature = "procmacro2_semver_exempt")]
     pub fn source_file(&self) -> SourceFile {
         SOURCE_MAP.with(|cm| {
             let cm = cm.borrow();
@@ -390,7 +390,7 @@ impl Span {
         })
     }
 
-    #[cfg(span_locations)]
+    #[cfg(feature = "span-locations")]
     pub fn start(&self) -> LineColumn {
         SOURCE_MAP.with(|cm| {
             let cm = cm.borrow();
@@ -399,7 +399,7 @@ impl Span {
         })
     }
 
-    #[cfg(span_locations)]
+    #[cfg(feature = "span-locations")]
     pub fn end(&self) -> LineColumn {
         SOURCE_MAP.with(|cm| {
             let cm = cm.borrow();
@@ -408,12 +408,12 @@ impl Span {
         })
     }
 
-    #[cfg(not(span_locations))]
+    #[cfg(not(feature = "span-locations"))]
     pub fn join(&self, _other: Span) -> Option<Span> {
         Some(Span {})
     }
 
-    #[cfg(span_locations)]
+    #[cfg(feature = "span-locations")]
     pub fn join(&self, other: Span) -> Option<Span> {
         SOURCE_MAP.with(|cm| {
             let cm = cm.borrow();
@@ -428,12 +428,12 @@ impl Span {
         })
     }
 
-    #[cfg(not(span_locations))]
+    #[cfg(not(feature = "span-locations"))]
     fn first_byte(self) -> Self {
         self
     }
 
-    #[cfg(span_locations)]
+    #[cfg(feature = "span-locations")]
     fn first_byte(self) -> Self {
         Span {
             lo: self.lo,
@@ -441,12 +441,12 @@ impl Span {
         }
     }
 
-    #[cfg(not(span_locations))]
+    #[cfg(not(feature = "span-locations"))]
     fn last_byte(self) -> Self {
         self
     }
 
-    #[cfg(span_locations)]
+    #[cfg(feature = "span-locations")]
     fn last_byte(self) -> Self {
         Span {
             lo: cmp::max(self.hi.saturating_sub(1), self.lo),
@@ -457,10 +457,10 @@ impl Span {
 
 impl fmt::Debug for Span {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        #[cfg(procmacro2_semver_exempt)]
+        #[cfg(feature = "procmacro2_semver_exempt")]
         return write!(f, "bytes({}..{})", self.lo, self.hi);
 
-        #[cfg(not(procmacro2_semver_exempt))]
+        #[cfg(not(feature = "procmacro2_semver_exempt"))]
         write!(f, "Span")
     }
 }
@@ -534,7 +534,7 @@ impl fmt::Debug for Group {
         let mut debug = fmt.debug_struct("Group");
         debug.field("delimiter", &self.delimiter);
         debug.field("stream", &self.stream);
-        #[cfg(procmacro2_semver_exempt)]
+        #[cfg(feature = "procmacro2_semver_exempt")]
         debug.field("span", &self.span);
         debug.finish()
     }
@@ -650,7 +650,7 @@ impl fmt::Display for Ident {
 
 impl fmt::Debug for Ident {
     // Ident(proc_macro), Ident(r#union)
-    #[cfg(not(procmacro2_semver_exempt))]
+    #[cfg(not(feature = "procmacro2_semver_exempt"))]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut debug = f.debug_tuple("Ident");
         debug.field(&format_args!("{}", self));
@@ -661,7 +661,7 @@ impl fmt::Debug for Ident {
     //     sym: proc_macro,
     //     span: bytes(128..138)
     // }
-    #[cfg(procmacro2_semver_exempt)]
+    #[cfg(feature = "procmacro2_semver_exempt")]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut debug = f.debug_struct("Ident");
         debug.field("sym", &format_args!("{}", self));
@@ -818,7 +818,7 @@ impl fmt::Debug for Literal {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         let mut debug = fmt.debug_struct("Literal");
         debug.field("lit", &format_args!("{}", self.text));
-        #[cfg(procmacro2_semver_exempt)]
+        #[cfg(feature = "procmacro2_semver_exempt")]
         debug.field("span", &self.span);
         debug.finish()
     }
@@ -847,7 +847,7 @@ fn token_stream(mut input: Cursor) -> PResult<TokenStream> {
     Ok((input, TokenStream { inner: trees }))
 }
 
-#[cfg(not(span_locations))]
+#[cfg(not(feature = "span-locations"))]
 fn spanned<'a, T>(
     input: Cursor<'a>,
     f: fn(Cursor<'a>) -> PResult<'a, T>,
@@ -856,7 +856,7 @@ fn spanned<'a, T>(
     Ok((a, ((b, crate::Span::_new_stable(Span::call_site())))))
 }
 
-#[cfg(span_locations)]
+#[cfg(feature = "span-locations")]
 fn spanned<'a, T>(
     input: Cursor<'a>,
     f: fn(Cursor<'a>) -> PResult<'a, T>,
